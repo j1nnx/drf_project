@@ -41,7 +41,6 @@ class Payments(models.Model):
     PAYMENT_STATUS = [
         ("cash", "наличные"),
         ("transfer", "перевод на счет"),
-        ("stripe", "Stripe")
     ]
 
     user = models.ForeignKey(
@@ -83,18 +82,6 @@ class Payments(models.Model):
         verbose_name="Способ оплаты",
         null=True,
         blank=True
-    )
-    stripe_session_id = models.CharField(
-        max_length=400,
-        null=True,
-        blank=True,
-        verbose_name="ID сессии Stripe"
-    )
-    stripe_status = models.CharField(
-        max_length=20,
-        null=True,
-        blank=True,
-        verbose_name="Статус оплаты в Stripe"
     )
 
     class Meta:
