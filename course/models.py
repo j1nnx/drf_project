@@ -1,4 +1,6 @@
 from django.db import models
+
+
 class Course(models.Model):
     title = models.CharField(
         max_length=255,
@@ -59,13 +61,14 @@ class Lessons(models.Model):
         help_text="Выберите курс, к которому относится урок",
     )
     owner = models.ForeignKey(
-        'users.User',
+        "users.User",
         on_delete=models.CASCADE,
         related_name="lessons",
         null=True,
         blank=True,
         verbose_name="Владелец",
-        help_text="Укажите владельца урока")
+        help_text="Укажите владельца урока",
+    )
 
     class Meta:
         verbose_name = "Урок"
@@ -73,7 +76,7 @@ class Lessons(models.Model):
 
 
 class Subscription(models.Model):
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    user = models.ForeignKey("users.User", on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -81,4 +84,4 @@ class Subscription(models.Model):
         return f"{self.user.username} подписан на {self.course.title}"
 
     class Meta:
-        unique_together = ('user', 'course')
+        unique_together = ("user", "course")

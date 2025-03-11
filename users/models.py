@@ -44,36 +44,27 @@ class Payments(models.Model):
     ]
 
     user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='user',
-        verbose_name="Пользователь"
+        User, on_delete=models.CASCADE, related_name="user", verbose_name="Пользователь"
     )
-    payment_date = models.DateField(
+    payment_date = models.DateField(null=True, blank=True, verbose_name="Дата оплаты")
+    paid_course = models.ForeignKey(
+        "course.Course",
+        on_delete=models.CASCADE,
+        related_name="course",
+        verbose_name="Оплаченный курс",
         null=True,
         blank=True,
-        verbose_name="Дата оплаты"
-    )
-    paid_course = models.ForeignKey(
-        'course.Course',
-        on_delete=models.CASCADE,
-        related_name='course',
-        verbose_name="Оплаченный курс",
-        null=True, blank=True
     )
     separately_paid_lesson = models.ForeignKey(
-        'course.Lessons',
+        "course.Lessons",
         on_delete=models.CASCADE,
-        related_name='lesson',
+        related_name="lesson",
         verbose_name="Оплаченный урок",
         null=True,
-        blank=True
+        blank=True,
     )
     payment_amount = models.IntegerField(
-        default=0,
-        verbose_name="Сумма оплаты",
-        null=True,
-        blank=True
+        default=0, verbose_name="Сумма оплаты", null=True, blank=True
     )
     payment_method = models.CharField(
         max_length=10,
@@ -81,9 +72,21 @@ class Payments(models.Model):
         default="cash",
         verbose_name="Способ оплаты",
         null=True,
-        blank=True
+        blank=True,
+    )
+    stripe_session_id = models.CharField(
+        max_length=400,
+        null=True,
+        blank=True,
+        verbose_name="ID сессии Stripe"
+    )
+    stripe_status = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        verbose_name="Статус оплаты в Stripe"
     )
 
     class Meta:
-        verbose_name = 'Платеж'
-        verbose_name_plural = 'Платежи'
+        verbose_name = "Платеж"
+        verbose_name_plural = "Платежи"
