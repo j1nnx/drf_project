@@ -10,6 +10,11 @@ python = "^3.12"
 dotenv = "^0.9.9"
 pytest = "^8.3.5"
 stripe = "^11.6.0"
+drf-yasg = "^1.21.10"
+black = "^25.1.0"
+django = "^5.1.7"
+django-restframework = "^0.0.1"
+django-rest-framework = "^0.1.0"
 
 
 [build-system]

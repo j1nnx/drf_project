@@ -14,7 +14,7 @@ class CourseTestCase(APITestCase):
             title="Урок по созданию денег",
             course=self.course,
             video_url="https://youtube.com/sample_video",
-            owner=self.user
+            owner=self.user,
         )
         self.client.force_authenticate(user=self.user)
 
@@ -32,7 +32,7 @@ class CourseTestCase(APITestCase):
     def test_get_lessons(self):
         response = self.client.get("/lessons/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_update_lesson(self):
         data = {
@@ -41,7 +41,9 @@ class CourseTestCase(APITestCase):
             "video_url": "https://youtube.com/updated_video",
             "course": self.course.id,
         }
-        response = self.client.put(f"/lessons/{self.lesson.id}/update/", data, format="json")
+        response = self.client.put(
+            f"/lessons/{self.lesson.id}/update/", data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.lesson.refresh_from_db()
         self.assertEqual(self.lesson.title, "Мишин урок")

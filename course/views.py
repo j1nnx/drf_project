@@ -1,12 +1,16 @@
 from datetime import timezone
-
 import stripe
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import (
-    CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, get_object_or_404
+    CreateAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
+    get_object_or_404,
 )
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -18,15 +22,17 @@ from course.paginations import CustomPagination
 from course.serializers import CourseSerializer, LessonsSerializer
 from users.models import Payments
 from users.permissions import IsModer, IsOwner
-from users.services import create_stripe_session, create_stripe_price, create_stripe_product
+from users.services import create_stripe_product, create_stripe_price, create_stripe_session
 
 
+@method_decorator(name='list', decorator=swagger_auto_schema(
+    operation_description="description from swagger_auto_schema via method_decorator"))
 class CourseViewSet(ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
     def get_permissions(self):
-        if self.action in ['create']:
+        if self.action in ["create"]:
             self.permission_classes = (~IsModer,)
         elif self.action in ["update", "retrieve"]:
             self.permission_classes = (IsModer | IsOwner,)
@@ -76,19 +82,23 @@ class LessonsDestroyAPIView(DestroyAPIView):
 class SubscriptionView(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
-        course_id = request.data.get('course_id')
+        course_id = request.data.get("course_id")
 
         if not course_id:
-            return Response({"error": "Course ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Course ID is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
         course = get_object_or_404(Course, id=course_id)
-        subscription, created = Subscription.objects.get_or_create(user=user, course=course)
+        subscription, created = Subscription.objects.get_or_create(
+            user=user, course=course
+        )
 
         if created:
-            message = 'Подписка добавлена'
+            message = "Подписка добавлена"
             status_code = status.HTTP_201_CREATED
         else:
             subscription.delete()
-            message = 'Подписка удалена'
+            message = "Подписка удалена"
             status_code = status.HTTP_204_NO_CONTENT
 
         return Response({"message": message}, status=status_code)

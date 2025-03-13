@@ -8,8 +8,8 @@ def create_stripe_product(course):
     """Создает продукт в Stripe на основе курса."""
     try:
         product = stripe.Product.create(
-            name=course.name,
-            description=course.description or f"Курс: {course.name}",
+            name=course.title,
+            description=course.description or f"Курс: {course.title}",
         )
         return product
     except stripe.error.StripeError as e:
