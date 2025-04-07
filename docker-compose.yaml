@@ -35,13 +35,12 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    # Убрана строка command с requirepass, чтобы Redis работал без пароля
 
   celery:
     build: .
     command: celery -A config worker -l info
     volumes:
-      - .:/code
+      - .:/app
     depends_on:
       redis:
         condition: service_started
@@ -49,6 +48,21 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    # Убрали user: myuser
+
+  celery_beat:
+    build: .
+    command: celery -A config beat -l info
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
 
 volumes:
   postgres_data:
