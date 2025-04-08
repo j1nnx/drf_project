@@ -63,6 +63,15 @@ services:
     env_file:
       - .env
 
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
 
 volumes:
   postgres_data:
