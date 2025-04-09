@@ -5,7 +5,6 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
     - name: Check out code
       uses: actions/checkout@v3
@@ -44,7 +43,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test
-
     steps:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.6.0
@@ -65,15 +63,17 @@ jobs:
           pip install -r requirements.txt
           EOF
 
-      - name: Set environment variables
-        run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
-
       - name: Apply migrations on server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
           source venv/bin/activate
           export SECRET_KEY='${{ secrets.SECRET_KEY }}'
+          export POSTGRES_DB='drf-hw'
+          export POSTGRES_USER='postgres'
+          export POSTGRES_PASSWORD='simplepassword123'
+          export DATABASE_HOST='localhost'
+          export DATABASE_PORT='5432'
           python manage.py migrate
           EOF
 
@@ -82,5 +82,11 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
           source venv/bin/activate
+          export SECRET_KEY='${{ secrets.SECRET_KEY }}'
+          export POSTGRES_DB='drf-hw'
+          export POSTGRES_USER='postgres'
+          export POSTGRES_PASSWORD='simplepassword123'
+          export DATABASE_HOST='localhost'
+          export DATABASE_PORT='5432'
           python manage.py collectstatic --noinput
           EOF
