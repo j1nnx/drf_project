@@ -74,6 +74,11 @@ jobs:
           cd ${{ secrets.DEPLOY_DIR }}
           source venv/bin/activate
           export SECRET_KEY='${{ secrets.SECRET_KEY }}'
+          export POSTGRES_DB='drf-hw'
+          export POSTGRES_USER='postgres'
+          export POSTGRES_PASSWORD='simplepassword123'
+          export DATABASE_HOST='localhost'
+          export DATABASE_PORT='5432'
           python manage.py migrate
           EOF
 
