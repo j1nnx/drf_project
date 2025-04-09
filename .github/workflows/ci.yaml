@@ -88,5 +88,6 @@ jobs:
           export POSTGRES_PASSWORD='simplepassword123'
           export DATABASE_HOST='localhost'
           export DATABASE_PORT='5432'
+          export TEST_ENV=''
           python manage.py collectstatic --noinput
           EOF
