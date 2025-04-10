@@ -76,24 +76,24 @@ jobs:
           pip install -r requirements.txt
           EOF
 
-      - name: Apply migrations on server
-        env:
-          TEST_ENV: ''
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          echo "Before cd, current directory:"
-          pwd
-          ls -la
-          cd ${{ secrets.DEPLOY_DIR }}
-          echo "After cd, current directory:"
-          pwd
-          ls -la
-          source venv/bin/activate
-          export SECRET_KEY='${{ secrets.SECRET_KEY }}'
-          export TEST_ENV=true
-          echo "DEBUG: TEST_ENV=$TEST_ENV"
-          python manage.py migrate
-          EOF
+#      - name: Apply migrations on server
+#        env:
+#          TEST_ENV: ''
+#        run: |
+#          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+#          echo "Before cd, current directory:"
+#          pwd
+#          ls -la
+#          cd ${{ secrets.DEPLOY_DIR }}
+#          echo "After cd, current directory:"
+#          pwd
+#          ls -la
+#          source venv/bin/activate
+#          export SECRET_KEY='${{ secrets.SECRET_KEY }}'
+#          export TEST_ENV=true
+#          echo "DEBUG: TEST_ENV=$TEST_ENV"
+#          python manage.py migrate
+#          EOF
 
       - name: Collect static files on server
         run: |
