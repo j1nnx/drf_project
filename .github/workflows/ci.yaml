@@ -78,16 +78,30 @@ jobs:
 
       - name: Apply migrations on server
         env:
-          TEST_ENV: true
+          TEST_ENV: ''
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           echo "Before cd, current directory:"
+          pwd
+          ls -la
           cd ${{ secrets.DEPLOY_DIR }}
           echo "After cd, current directory:"
           pwd
           ls -la
           source venv/bin/activate
           export SECRET_KEY='${{ secrets.SECRET_KEY }}'
+          export POSTGRES_DB='drf-hw'
+          export POSTGRES_USER='postgres'
+          export POSTGRES_PASSWORD='simplepassword123'
+          export DATABASE_HOST='localhost'
+          export DATABASE_PORT='5432'
+          export TEST_ENV=''
+          echo "DEBUG: POSTGRES_DB=$POSTGRES_DB"
+          echo "DEBUG: POSTGRES_USER=$POSTGRES_USER"
+          echo "DEBUG: POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
+          echo "DEBUG: DATABASE_HOST=$DATABASE_HOST"
+          echo "DEBUG: DATABASE_PORT=$DATABASE_PORT"
+          echo "DEBUG: TEST_ENV=$TEST_ENV"
           python manage.py migrate
           EOF
 
