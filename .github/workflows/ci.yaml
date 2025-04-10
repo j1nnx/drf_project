@@ -49,8 +49,10 @@ jobs:
 
       - name: Copy project files to server
         run: |
-            rsync -avz --exclude '__pycache__' . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}
-            ls
+          rsync -avzr -e "ssh -o StrictHostKeyChecking=no" --exclude '__pycache__' --include '.env' ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ls -la ${{ secrets.DEPLOY_DIR }}
+          EOF
 
       - name: Install dependencies on server
         run: |
