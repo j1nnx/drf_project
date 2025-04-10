@@ -50,7 +50,6 @@ jobs:
       - name: Copy project files to server
         run: |
           rsync -avz -e "ssh -o StrictHostKeyChecking=no" --exclude '__pycache__' --include '.env' . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}
-          cd ${{ secrets.DEPLOY_DIR }}
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           ls -la ${{ secrets.DEPLOY_DIR }}
           cat ${{ secrets.DEPLOY_DIR }}/config/settings.py | grep ENGINE
