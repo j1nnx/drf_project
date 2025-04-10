@@ -41,17 +41,17 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Clean server directory
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          rm -rf ${{ secrets.DEPLOY_DIR }}/*
-          EOF
+#      - name: Clean server directory
+#        run: |
+#          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+#          rm -rf ${{ secrets.DEPLOY_DIR }}/*
+#          EOF
 
       - name: Copy project files to server
         run: |
           echo "Listing files in GitHub Actions runner before rsync:"
           ls -la
-          rsync -avzr -e "ssh -o StrictHostKeyChecking=no" --exclude '__pycache__' --exclude '.git' --exclude '.gitignore' --exclude '.env.sample' ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
+          rsync -avzr -e "ssh -o StrictHostKeyChecking=no" --exclude '__pycache__' --exclude '.git' --exclude '.gitignore' --exclude '.env.sample' ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           echo "After rsync, listing contents of ${{ secrets.DEPLOY_DIR }}:"
           ls -la ${{ secrets.DEPLOY_DIR }}
