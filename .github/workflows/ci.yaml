@@ -49,25 +49,41 @@ jobs:
 
       - name: Copy project files to server
         run: |
-          rsync -avzr -e "ssh -o StrictHostKeyChecking=no" --exclude '__pycache__' --include '.env' ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
+          rsync -avzr -e "ssh -o StrictHostKeyChecking=no" --exclude '__pycache__' --include '.env' --include '*.txt' --include 'manage.py' --include 'config/' --include 'config/*' --include 'users/' --include 'users/*' --include 'course/' --include 'course/*' ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          echo "After rsync, listing contents of ${{ secrets.DEPLOY_DIR }}:"
           ls -la ${{ secrets.DEPLOY_DIR }}
+          ls -la ${{ secrets.DEPLOY_DIR }}/config 2>/dev/null || echo "config directory not found"
           EOF
 
       - name: Install dependencies on server
         run: |
-          cd ${{ secrets.DEPLOY_DIR }}
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          echo "Before cd, current directory:"
+          pwd
+          ls -la
+          cd ${{ secrets.DEPLOY_DIR }}
+          echo "After cd, current directory:"
+          pwd
+          ls -la
           python3 -m venv venv || true
           source venv/bin/activate
           pip install --upgrade pip
+          echo "Before installing requirements, listing contents:"
+          ls -la
           pip install -r requirements.txt
           EOF
 
       - name: Apply migrations on server
         run: |
-          cd ${{ secrets.DEPLOY_DIR }}
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          echo "Before cd, current directory:"
+          pwd
+          ls -la
+          cd ${{ secrets.DEPLOY_DIR }}
+          echo "After cd, current directory:"
+          pwd
+          ls -la
           source venv/bin/activate
           export SECRET_KEY='${{ secrets.SECRET_KEY }}'
           export POSTGRES_DB='drf-hw'
