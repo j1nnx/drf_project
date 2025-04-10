@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   web:
     build: .
@@ -48,7 +50,6 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    # Убрали user: myuser
 
   celery_beat:
     build: .
@@ -66,12 +67,11 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: nginx/Dockerfile
+      dockerfile: ./nginx/Dockerfile
     ports:
       - "80:80"
     depends_on:
       - web
-
 
 volumes:
   postgres_data:
