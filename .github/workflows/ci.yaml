@@ -76,10 +76,20 @@ jobs:
           pip install -r requirements.txt
           EOF
 
-      - name: Run migrations
+      - name: Apply migrations on server
         env:
           TEST_ENV: true
-        run: python manage.py migrate
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          echo "Before cd, current directory:"
+          cd ${{ secrets.DEPLOY_DIR }}
+          echo "After cd, current directory:"
+          pwd
+          ls -la
+          source venv/bin/activate
+          export SECRET_KEY='${{ secrets.SECRET_KEY }}'
+          python manage.py migrate
+          EOF
 
       - name: Collect static files on server
         run: |
@@ -92,7 +102,7 @@ jobs:
           export POSTGRES_PASSWORD='simplepassword123'
           export DATABASE_HOST='localhost'
           export DATABASE_PORT='5432'
-          export TEST_ENV=true
+          export TEST_ENV=''
           echo "DEBUG: POSTGRES_DB=$POSTGRES_DB"
           echo "DEBUG: TEST_ENV=$TEST_ENV"
           python manage.py collectstatic --noinput
