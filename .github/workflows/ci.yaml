@@ -22,15 +22,6 @@ jobs:
     - name: Set environment variables
       run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
 
-    - name: Run migrations
-      env:
-        DATABASE_NAME: test_db
-        DATABASE_USER: postgres
-        DATABASE_HOST: localhost
-        DATABASE_PORT: 5432
-        TEST_ENV: true
-      run: python manage.py migrate
-
     - name: Run tests
       env:
         DATABASE_NAME: test_db
