@@ -83,16 +83,34 @@ REST_FRAMEWORK = {
 #     }
 # }
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("POSTGRES_DB") if not os.getenv("TEST_ENV") else os.path.join(BASE_DIR, "test_db.sqlite3"),
-        "USER": os.getenv("POSTGRES_USER") if not os.getenv("TEST_ENV") else "",
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD") if not os.getenv("TEST_ENV") else "",
-        "HOST": os.getenv("DATABASE_HOST") if not os.getenv("TEST_ENV") else "",
-        "PORT": os.getenv("DATABASE_PORT", default="5432") if not os.getenv("TEST_ENV") else "",
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         "NAME": os.getenv("POSTGRES_DB") if not os.getenv("TEST_ENV") else os.path.join(BASE_DIR, "test_db.sqlite3"),
+#         "USER": os.getenv("POSTGRES_USER") if not os.getenv("TEST_ENV") else "",
+#         "PASSWORD": os.getenv("POSTGRES_PASSWORD") if not os.getenv("TEST_ENV") else "",
+#         "HOST": os.getenv("DATABASE_HOST") if not os.getenv("TEST_ENV") else "",
+#         "PORT": os.getenv("DATABASE_PORT", default="5432") if not os.getenv("TEST_ENV") else "",
+#     }
+# }
+if os.getenv("TEST_ENV"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "test_db.sqlite3"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.getenv("POSTGRES_DB", "drf-hw"),
+            "USER": os.getenv("POSTGRES_USER", "postgres"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD", "simplepassword123"),
+            "HOST": os.getenv("DATABASE_HOST", "localhost"),
+            "PORT": os.getenv("DATABASE_PORT", "5432"),
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
