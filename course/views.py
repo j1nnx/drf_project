@@ -1,8 +1,5 @@
 from datetime import timezone
 
-import stripe
-from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import (
@@ -16,9 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 from course.models import Course, Lessons, Subscription
 from course.paginations import CustomPagination
 from course.serializers import CourseSerializer, LessonsSerializer
-from users.models import Payments
 from users.permissions import IsModer, IsOwner
-from users.services import create_stripe_session, create_stripe_price, create_stripe_product
 
 
 class CourseViewSet(ModelViewSet):
@@ -92,60 +87,3 @@ class SubscriptionView(APIView):
             status_code = status.HTTP_204_NO_CONTENT
 
         return Response({"message": message}, status=status_code)
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def create_payment(request, course_id):
-    try:
-        course = Course.objects.get(id=course_id)
-        user = request.user if request.user.is_authenticated else None
-        product = create_stripe_product(course)
-        product_id = product.id
-        price = create_stripe_price(course.price, product_id)
-        price_id = price.id
-        payment = Payments.objects.create(
-            user=user,
-            paid_course=course,
-            payment_amount=course.price,
-            payment_method="stripe",
-            stripe_status="pending",
-        )
-        success_url = "http://127.0.0.1:8000/success/"
-        cancel_url = "http://127.0.0.1:8000/cancel/"
-        session_id, session_url = create_stripe_session(price_id, success_url, cancel_url, course_id, user.id)
-        payment.stripe_session_id = session_id
-        payment.save()
-
-        return Response({"payment_url": session_url})
-    except Course.DoesNotExist:
-        return Response({"error": "Курс не найден"}, status=404)
-    except Exception as e:
-        return Response({"error": str(e)}, status=500)
-
-
-@api_view(['GET'])
-def payment_success(request):
-    session_id = request.GET.get('session_id')
-    if not session_id:
-        return Response({"error": "Session ID не предоставлен"}, status=400)
-
-    try:
-        session = stripe.checkout.Session.retrieve(session_id)
-        if session.payment_status == "paid":
-            payment = Payments.objects.get(stripe_session_id=session_id)
-            payment.stripe_status = "completed"
-            payment.payment_date = timezone.now()
-            payment.save()
-            return Response({"message": "Оплата успешно завершена"})
-        else:
-            return Response({"error": "Оплата не завершена"}, status=400)
-    except Payments.DoesNotExist:
-        return Response({"error": "Платеж не найден"}, status=404)
-    except stripe.error.StripeError as e:
-        return Response({"error": str(e)}, status=500)
-
-
-@api_view(['GET'])
-def payment_cancel(request):
-    return Response({"message": "Оплата отменена"})

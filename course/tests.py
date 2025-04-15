@@ -5,6 +5,7 @@ from course.models import Course, Lessons, Subscription
 from users.models import User
 
 
+
 class CourseTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="admin@sky.pro")
